@@ -9,7 +9,6 @@ from dranspose.middlewares.sardana import parse as sardana_parse
 from dranspose.data.stream1 import Stream1Data, Stream1Start
 import numpy as np
 from numpy import unravel_index
-from scipy.ndimage import gaussian_filter
 
 logger = logging.getLogger(__name__)
 
