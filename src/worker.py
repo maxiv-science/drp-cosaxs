@@ -32,8 +32,9 @@ class CosaxsWorker:
         ret = {}
 
         dat = None
-        if "eiger" in event.streams:
-            dat = parse(event.streams["eiger"])
+        if "pilatus" in event.streams:
+            dat = parse(event.streams["pilatus"])
+        print("image data", dat)
         if dat:
             if isinstance(dat, Stream1Start):
                 print("start message", dat)
