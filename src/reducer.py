@@ -68,14 +68,14 @@ class CosaxsReducer:
     def timer(self):
         print("timed")
         if len(self.buffer) > 0:
-            if first:
+            if self.first:
                 self.hsds.require_group("pcap")
                 try:
                     del self.hsds["pcap"]["data"]
                 except:
                     pass
                 self.hsds["pcap"].require_dataset("data", shape=(0,), maxshape=(None,),
-                                                  dtype=ds_dt)  # len(result.payload["pcap_start"]),
+                                                  dtype=self.ds_dt)  # len(result.payload["pcap_start"]),
 
                 self.first = False
 
