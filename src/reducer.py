@@ -20,11 +20,8 @@ class CosaxsReducer:
         self.processed_filename = None
         self.hsds = h5pyd.File("http://cosaxs-pipeline-hsds.daq.maxiv.lu.se/home/live", username="admin",
                                password="admin", mode="a")
-        self.hsds.require_group("pcap")
-        try:
-            del self.hsds["pcap"]["data"]
-        except:
-            pass
+        self.first = True
+
         self.start = None
         self.buffer = []
         self.i = 0
@@ -49,10 +46,8 @@ class CosaxsReducer:
             #self.hsds["pcap"].require_dataset(field.name, shape=(10000,), dtype=field.type)
             #    pass
             col_names = [field.name for field in result.payload["pcap_start"]]
-            ds_dt = np.dtype({'names': col_names,
+            self.ds_dt = np.dtype({'names': col_names,
                               'formats': [(float)]*len(col_names)})
-            self.hsds["pcap"].require_dataset("data", shape=(0, ), maxshape=(None,), dtype=ds_dt) # len(result.payload["pcap_start"]),
-            pass
 
         if "pcap" in result.payload:
             data = {}
@@ -65,14 +60,25 @@ class CosaxsReducer:
 
                 #self.cg_ds = self.hsds["basler"].require_dataset("cg", shape=(2,), dtype=float)
             self.buffer.append(tuple(data.values()))
-            time.sleep(1)
-            print("data", result.event_number, data)
+            #time.sleep(1)
+            #print("data", result.event_number, data)
             #self.hsds["pcap/data"][5*result.event_number:5*result.event_number+5] = []*5
             #self.hsds["frame"][()] = int(result.event_number)
 
     def timer(self):
         print("timed")
         if len(self.buffer) > 0:
+            if first:
+                self.hsds.require_group("pcap")
+                try:
+                    del self.hsds["pcap"]["data"]
+                except:
+                    pass
+                self.hsds["pcap"].require_dataset("data", shape=(0,), maxshape=(None,),
+                                                  dtype=ds_dt)  # len(result.payload["pcap_start"]),
+
+                self.first = False
+
             cpy = copy(self.buffer)
             self.buffer = []
             print("upload buffer", cpy)
