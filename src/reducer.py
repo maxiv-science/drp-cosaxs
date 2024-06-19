@@ -45,7 +45,15 @@ class CosaxsReducer:
             #for field in result.payload["pcap_start"]:
             #self.hsds["pcap"].require_dataset(field.name, shape=(10000,), dtype=field.type)
             #    pass
-            col_names = [field.name for field in result.payload["pcap_start"]]
+            rawcol_names = [field.name for field in result.payload["pcap_start"]]
+            connmap = {"FMC_IN.VAL3":"I_t", "FMC_IN.VAL6":"I_0"}
+            col_names = []
+            for cn in rawcol_names:
+                chg = cn
+                for fr,to in connmap.items():
+                    chg = chg.replace(fr,to)
+                col_names.append(chg)
+            print("col names", col_names)
             self.ds_dt = np.dtype({'names': col_names,
                               'formats': [(float)]*len(col_names)})
 
