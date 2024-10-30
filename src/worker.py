@@ -39,18 +39,20 @@ class CosaxsWorker:
         print("image data", dat)
         if dat:
             if isinstance(dat, Stream1Start):
-                return {**ret, "processed_filename": dat.filename}
+                # return {**ret, "processed_filename": dat.filename}
+                ret["processed_filename"] = dat.filename
             if not isinstance(dat, Stream1Data):
-                return None
+                pass
 
             # your code here
             # return whatever you need in reduce
-            return {"img": dat.data, "cropped": None}
+            # return {"img": dat.data, "cropped": None}
 
         if "pcap" in event.streams:
             res = self.pcap.parse(event.streams["pcap"])
             if isinstance(res, PositionCapStart):
-                return {"pcap_start": self.pcap.fields}
+                ret["pcap_start"] = self.pcap.fields
+
             if isinstance(res, PositionCapValues):
                 triggertime = timedelta(seconds=res.fields["PCAP.TS_TRIG.Value"].value)
                 logger.debug(
@@ -58,7 +60,9 @@ class CosaxsWorker:
                     res,
                     self.pcap.arm_time + triggertime,
                 )
-                return {"pcap": res, "time": self.pcap.arm_time + triggertime}
+                ret.update({"pcap": res, "time": self.pcap.arm_time + triggertime})
+        if len(ret) > 0:
+            return ret
 
     def finish(self, parameters=None):
         print("finished")
