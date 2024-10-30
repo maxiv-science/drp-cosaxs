@@ -6,6 +6,7 @@ from dranspose.event import EventData
 from dranspose.parameters import IntParameter, StrParameter, BoolParameter
 from dranspose.middlewares.stream1 import parse
 from dranspose.middlewares.sardana import parse as sardana_parse
+from dranspose.middlewares.pcap import parse as pcap_parse
 from dranspose.middlewares.positioncap import PositioncapParser
 from dranspose.data.positioncap import PositionCapValues, PositionCapStart
 from datetime import timedelta
@@ -48,6 +49,10 @@ class CosaxsWorker:
             # return whatever you need in reduce
             # return {"img": dat.data, "cropped": None}
 
+        if "pcap_proc" in event.streams:
+            p = pcap_parse(event.streams["pcap_proc"])
+            logger.debug("proc is %s", event.streams["pcap_proc"])
+            logger.debug("parsed %s", p)
         if "pcap" in event.streams:
             res = self.pcap.parse(event.streams["pcap"])
             if isinstance(res, PositionCapStart):
