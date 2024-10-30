@@ -2,9 +2,11 @@ import logging
 import tempfile
 import json
 
+import zmq
+from bitshuffle import decompress_lz4
 from dranspose.event import EventData
 from dranspose.parameters import IntParameter, StrParameter, BoolParameter
-from dranspose.middlewares.stream1 import parse
+from dranspose.middlewares.stream1 import parse as parse_stins
 from dranspose.middlewares.sardana import parse as sardana_parse
 from dranspose.middlewares.pcap import parse as pcap_parse
 from dranspose.middlewares.positioncap import PositioncapParser
@@ -36,14 +38,22 @@ class CosaxsWorker:
 
         dat = None
         if "pilatus" in event.streams:
-            dat = parse(event.streams["pilatus"])
+            dat = parse_stins(event.streams["pilatus"])
         print("image data", dat)
         if dat:
             if isinstance(dat, Stream1Start):
                 # return {**ret, "processed_filename": dat.filename}
                 ret["processed_filename"] = dat.filename
-            if not isinstance(dat, Stream1Data):
-                pass
+            if isinstance(dat, Stream1Data):
+                if "bslz4" in dat.compression:
+                    bufframe = event.streams["pilatus"].frames[1]
+                    if isinstance(bufframe, zmq.Frame):
+                        bufframe = bufframe.bytes
+                    img = decompress_lz4(bufframe, dat.shape, dtype=dat.type)
+                else:
+                    assert hasattr(dat, "data")
+                    img = dat.data
+                logger.debug("got pilatus image %s", img)
 
             # your code here
             # return whatever you need in reduce
