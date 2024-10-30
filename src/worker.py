@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 class CosaxsWorker:
-
     @staticmethod
     def describe_parameters():
         params = [
@@ -31,7 +30,7 @@ class CosaxsWorker:
             context["ai"] = 5
         self.pcap = PositioncapParser()
 
-    def process_event(self, event: EventData, parameters=None):
+    def process_event(self, event: EventData, parameters=None, **kwargs):
         ret = {}
 
         dat = None
@@ -46,7 +45,7 @@ class CosaxsWorker:
 
             # your code here
             # return whatever you need in reduce
-            return {"img": dat.data , "cropped": None}
+            return {"img": dat.data, "cropped": None}
 
         if "pcap" in event.streams:
             res = self.pcap.parse(event.streams["pcap"])
@@ -54,7 +53,7 @@ class CosaxsWorker:
                 return {"pcap_start": self.pcap.fields}
             if isinstance(res, PositionCapValues):
                 triggertime = timedelta(seconds=res.fields["PCAP.TS_TRIG.Value"].value)
-                logger.info(
+                logger.debug(
                     "got values %s at timestamp %s",
                     res,
                     self.pcap.arm_time + triggertime,

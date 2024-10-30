@@ -1,4 +1,5 @@
 dranspose @ git+https://gitlab.maxiv.lu.se/scisw/daq-modules/dranspose@main
 h5py
 h5pyd
+setuptools # remove once new h5pyd is released: https://github.com/HDFGroup/h5pyd/pull/184
 numpy
