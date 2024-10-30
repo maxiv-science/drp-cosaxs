@@ -33,7 +33,7 @@ class CosaxsWorker:
             context["ai"] = 5
         self.pcap = PositioncapParser()
 
-    def process_event(self, event: EventData, parameters=None, **kwargs):
+    def process_event(self, event: EventData, parameters=None, *args, **kwargs):
         ret = {}
 
         dat = None
