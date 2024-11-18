@@ -16,7 +16,9 @@ def test_livequery():
         args=(
             "src.worker:CosaxsWorker",
             "src.reducer:CosaxsReducer",
-            ["data/pcaptestpcap-ingester-7961ecb0-4844-4b47-a0a2-e0855c37dd79.pkls"],
+            [
+                "data/pcaptestpcapRAW-ingester-7961ecb0-4844-4b47-a0a2-e0855c37dd79.cbors"
+            ],
             None,
             "testparams.json",
         ),
